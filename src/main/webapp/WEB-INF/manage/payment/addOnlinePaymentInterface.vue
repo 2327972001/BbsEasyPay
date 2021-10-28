@@ -88,7 +88,6 @@ export default({
 			interfaceProduct :'',
 			options: [],
 			sort:0,
-
 			direct_app_id :'',
 			direct_rsa_private_key :'',
 			direct_alipay_public_key :'',
@@ -210,7 +209,6 @@ export default({
 			if(_self.enable != null){
 				formData.append('enable', _self.enable);
 			}
-
 			if(_self.direct_app_id != null){
 				formData.append('direct_app_id', _self.direct_app_id);
 			}

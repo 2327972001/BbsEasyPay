@@ -240,14 +240,14 @@ export default({
 			if(_self.mobile_alipay_public_key != null){
 				formData.append('mobile_alipay_public_key', _self.mobile_alipay_public_key);
 			}
-
+      //易支付
       if(_self.easy_app_id != null){
         formData.append('easy_app_id', _self.easy_app_id);
       }
       if(_self.easy_epay_public_key != null){
         formData.append('easy_epay_public_key', _self.easy_epay_public_key);
       }
-
+			
 			_self.$ajax({
 		        method: 'post',
 		        url: 'control/onlinePaymentInterface/manage?method=edit',

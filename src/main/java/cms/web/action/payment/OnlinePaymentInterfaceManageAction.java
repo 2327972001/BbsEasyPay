@@ -1,15 +1,5 @@
 package cms.web.action.payment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import cms.bean.RequestResult;
 import cms.bean.ResultCode;
 import cms.bean.payment.Alipay;
@@ -17,7 +7,7 @@ import cms.bean.payment.Epay;
 import cms.bean.payment.OnlinePaymentInterface;
 import cms.service.payment.PaymentService;
 import cms.utils.JsonUtils;
-
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -29,7 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.collect.ImmutableMap;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * 在线支付接口管理
@@ -47,7 +40,11 @@ public class OnlinePaymentInterfaceManageAction{
 	
 	
 	@Resource OnlinePaymentInterfaceManage onlinePaymentInterfaceManage;
-	private Map<Integer,String> paymentInterfaceProductParameter = ImmutableMap.of(1, "支付宝即时到账", 4, "支付宝手机网站(alipay.trade.wap.pay)",5,"易支付");//支付接口产品
+	/*
+	* @author: Mr.Zou
+	* @create: 2021-10-28 12:21
+	*/
+	private Map<Integer,String> paymentInterfaceProductParameter = ImmutableMap.of(1, "支付宝即时到账", 4, "支付宝手机网站(alipay.trade.wap.pay)", 5,"易支付");//支付接口产品
 	
 	
 	/**
@@ -90,8 +87,12 @@ public class OnlinePaymentInterfaceManageAction{
 		
 		Alipay alipay_direct = new Alipay();//支付宝即时到账
 		Alipay alipay_mobile = new Alipay();//支付宝手机网站(alipay.trade.wap.pay接口)
+		/*
+		* @author: Mr.Zou
+		* @create: 2021-10-28 12:59
+		*/
 		Epay epay_easy = new Epay();//易支付
-		
+
 		String dynamicParameter = "";
 		
 		
@@ -247,8 +248,11 @@ public class OnlinePaymentInterfaceManageAction{
 					}else if(paymentInterface.getInterfaceProduct().equals(4)){//支付宝手机网站(alipay.trade.wap.pay接口)
 						Alipay alipay_bank = JsonUtils.toObject(paymentInterface.getDynamicParameter(), Alipay.class);
 						returnValue.put("alipayMobile", alipay_bank);
-
 					}else if(paymentInterface.getInterfaceProduct().equals(5)){//易支付
+						/*
+						* @author: Mr.Zou
+						* @create: 2021-10-28 13:00
+						*/
 						Epay epay_easy = JsonUtils.toObject(paymentInterface.getDynamicParameter(), Epay.class);
 						returnValue.put("epayEasy",epay_easy);
 					}
@@ -285,6 +289,10 @@ public class OnlinePaymentInterfaceManageAction{
 				
 				Alipay alipay_direct = new Alipay();//支付宝即时到账
 				Alipay alipay_mobile = new Alipay();//支付宝手机网站(alipay.trade.wap.pay接口)
+				/*
+				* @author: Mr.Zou
+				* @create: 2021-10-28 13:01
+				*/
 				Epay epay_easy = new Epay();//易支付
 				
 				
@@ -335,6 +343,10 @@ public class OnlinePaymentInterfaceManageAction{
 					dynamicParameter = JsonUtils.toJSONString(alipay_mobile);
 
 				}else if(onlinePaymentInterface.getInterfaceProduct().equals(5)){//5.易支付
+					/*
+					* @author: Mr.Zou
+					* @create: 2021-10-28 13:01
+					*/
 					String easy_app_id = request.getParameter("easy_app_id");
 					String easy_epay_public_key = request.getParameter("easy_epay_public_key");
 

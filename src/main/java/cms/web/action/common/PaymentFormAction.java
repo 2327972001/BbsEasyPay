@@ -1,25 +1,6 @@
 package cms.web.action.common;
 
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import cms.epay.bean.EpaySubmit;
-import cms.epay.function.EpayNotify;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.internal.util.AlipaySignature;
-import com.alipay.api.request.AlipayTradePagePayRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
 import cms.bean.ErrorView;
 import cms.bean.payment.Bank;
 import cms.bean.payment.OnlinePaymentInterface;
@@ -28,6 +9,8 @@ import cms.bean.payment.PaymentVerificationLog;
 import cms.bean.setting.SystemSetting;
 import cms.bean.user.AccessUser;
 import cms.bean.user.User;
+import cms.epay.bean.EpaySubmit;
+import cms.epay.function.EpayNotify;
 import cms.service.payment.PaymentService;
 import cms.service.setting.SettingService;
 import cms.service.template.TemplateService;
@@ -44,7 +27,11 @@ import cms.web.action.payment.impl.mobile.AlipayConfig_Mobile;
 import cms.web.action.payment.impl.pc.AlipayConfig_PC;
 import cms.web.action.payment.impl.pc.EpayConfig_PC;
 import cms.web.taglib.Configuration;
-
+import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,7 +40,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 /**
@@ -475,7 +466,7 @@ public class PaymentFormAction {
 		BigDecimal paymentAmount = new BigDecimal("0");
 		
 		
-		if(interfaceProduct.equals(1)){//1.支付宝即时到账
+		if(interfaceProduct.equals(1)){//1.支付宝即时到账 
 			//获取支付宝POST过来反馈信息
 			Map<String,String> params = new HashMap<String,String>();
 			Map requestParams = request.getParameterMap();
@@ -664,10 +655,8 @@ public class PaymentFormAction {
 			//	valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
 				params.put(name, valueStr);
 			}
-
-			//调用SDK验证签名
-			boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayConfig_PC.getAlipayPublicKey(interfaceProduct), alipayConfig_PC.CHARSET, alipayConfig_PC.SIGNTYPE);
-
+			
+			boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayConfig_PC.getAlipayPublicKey(interfaceProduct), alipayConfig_PC.CHARSET, alipayConfig_PC.SIGNTYPE); //调用SDK验证签名
 			if(signVerified){
 				//商户订单号
 				String out_trade_no = request.getParameter("out_trade_no");
@@ -687,31 +676,8 @@ public class PaymentFormAction {
 				//如果有做过处理，不执行商户的业务程序
 				String remark = "在线付款金额："+paymentAmount+"元；支付宝交易号："+trade_no+" 系统支付流水号："+out_trade_no ;
 				paymentVerificationLog = this.systemPayment(out_trade_no,interfaceProduct,paymentAmount,remark,trade_no);
-			}
-		}else if(interfaceProduct.equals(5)){//5.易支付
-			/*
-			 * @description: 支付完成通知
-			 * @author: Mr.Zou
-			 * @create: 2021-10-21 22:09
-			 */
-			EpayNotify epayNotify = new EpayNotify(epayConfig_PC);
-			//验证签名
-			boolean verifyReturn = epayNotify.verifyReturn(request,response);
-			if(verifyReturn){
-				//商户订单号
-				String out_trade_no = request.getParameter("out_trade_no");
-				//支付宝交易号
-				String trade_no = request.getParameter("trade_no");
-				//付款金额
-				String total_amount = request.getParameter("money");
-				if(total_amount != null && !"".equals(total_amount)){
-					paymentAmount = new BigDecimal(total_amount);
-				}
-				//判断该笔订单是否在商户网站中已经做过处理
-				//如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
-				//如果有做过处理，不执行商户的业务程序
-				String remark = "在线付款金额："+paymentAmount+"元；易支付交易号："+trade_no+" 系统支付流水号："+out_trade_no ;
-				paymentVerificationLog = this.systemPayment(out_trade_no,interfaceProduct,paymentAmount,remark,trade_no);
+				
+				
 			}
 		}else if(interfaceProduct.equals(4)){//4.支付宝手机网站(alipay.trade.wap.pay)
 			//获取支付宝GET过来反馈信息
@@ -756,6 +722,31 @@ public class PaymentFormAction {
 				
 			}
 
+		}else if(interfaceProduct.equals(5)){//5.易支付
+			/*
+			 * @description: 支付完成通知
+			 * @author: Mr.Zou
+			 * @create: 2021-10-21 22:09
+			 */
+			EpayNotify epayNotify = new EpayNotify(epayConfig_PC);
+			//验证签名
+			boolean verifyReturn = epayNotify.verifyReturn(request,response);
+			if(verifyReturn){
+				//商户订单号
+				String out_trade_no = request.getParameter("out_trade_no");
+				//支付宝交易号
+				String trade_no = request.getParameter("trade_no");
+				//付款金额
+				String total_amount = request.getParameter("money");
+				if(total_amount != null && !"".equals(total_amount)){
+					paymentAmount = new BigDecimal(total_amount);
+				}
+				//判断该笔订单是否在商户网站中已经做过处理
+				//如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+				//如果有做过处理，不执行商户的业务程序
+				String remark = "在线付款金额："+paymentAmount+"元；易支付交易号："+trade_no+" 系统支付流水号："+out_trade_no ;
+				paymentVerificationLog = this.systemPayment(out_trade_no,interfaceProduct,paymentAmount,remark,trade_no);
+			}
 		}
 		
 		Map<String,Object> returnValue = new HashMap<String,Object>();//返回值
@@ -825,7 +816,7 @@ public class PaymentFormAction {
 	 * @param interfaceProduct 接口产口
 	 * @param paymentModule 支付模块
 	 * @param paymentRunningNumber 支付流水号
-	 * @param parameterId 参数Id  订单Id 售后服务服务Id 用户Id
+	 * @param parameterId 参数Id    订单Id 售后服务服务Id 用户Id
 	 * @param orderName 订单名称
 	 * @param total 付款金额
 	 * @param code 银行简码
@@ -849,6 +840,7 @@ public class PaymentFormAction {
 			String return_url = Configuration.getUrl(request)+"paymentCompleted/"+interfaceProduct+"/"+paymentModule+"/"+parameterId;
 			
 			AlipayClient client = alipayConfig_PC.getAlipayClient(interfaceProduct);
+			
 			if(client != null){
 				//设置请求参数
 				AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
@@ -928,10 +920,10 @@ public class PaymentFormAction {
 			}
 		}else if(interfaceProduct.equals(5)){//5.易支付
 			/*
-			* @description: 发起支付请求
-			* @author: Mr.Zou
-			* @create: 2021-10-21 21:51
-			*/
+			 * @description: 发起支付请求
+			 * @author: Mr.Zou
+			 * @create: 2021-10-21 21:51
+			 */
 			// 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 			String notify_url = Configuration.getUrl(request)+"notify/"+interfaceProduct;
 			// 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问

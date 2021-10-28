@@ -1,15 +1,12 @@
 package cms.web.action.payment;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import cms.bean.payment.Bank;
 import cms.service.payment.PaymentService;
-
-
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 在线支付接口管理
@@ -39,9 +36,11 @@ public class OnlinePaymentInterfaceManage{
 		if(interfaceProduct.equals(4)){//4.支付宝手机网站(alipay.trade.wap.pay接口)
 			bankList.add(new Bank("ALIPAY-WAP","支付宝","ALIPAY-WAP.gif"));
 		}
-
-
-		if(interfaceProduct.equals(5)){//5.易支付(接口)
+		/*
+		* @author: Mr.Zou
+		* @create: 2021-10-28 12:20
+		*/
+		if(interfaceProduct.equals(5)){//4.支付宝手机网站(alipay.trade.wap.pay接口)
 			bankList.add(new Bank("EPAY","易支付","ALIPAY.gif"));
 		}
 		
