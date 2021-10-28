@@ -2,7 +2,7 @@
 
 #### 介绍
 巡云论坛易支付插件，有BUG欢迎留言！
-
+巡云论坛主程序下载：[https://gitee.com/diyhi/bbs](https://gitee.com/diyhi/bbs)
 
 #### 安装教程
 
